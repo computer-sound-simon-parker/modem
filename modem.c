@@ -1,10 +1,5 @@
 //simon parker
 
-/*
-  TODO:
-    -func that writes a byte to a file (does this need to be its own function?)
-*/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
