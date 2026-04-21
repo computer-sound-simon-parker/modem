@@ -2,18 +2,7 @@
 
 /*
   TODO:
-    -func that calculates the power for a test frequency (DONE)
-    -func that reads in wav data
-    -func that reads a block of samples and deciphers the bit
-    -func that takes in 10 blocks of samples and deciphers the byte
     -func that writes a byte to a file (does this need to be its own function?)
-
-
-    code flow:
-    read in 1 byte of data from the wav file (1600 samples, however many bytes of data that is (16 bits per sample, mono))
-    for each bit in that byte (+2 for the start/stop), test which frequencies are dominant in that block (160 samples)
-    write the decoded byte to the txt file
-    print out the decoded byte
 */
 
 #include <stdlib.h>
@@ -27,7 +16,8 @@
 #define SAMPLES_PER_BYTE 1600
 #define MARK_FREQUENCY 2225
 #define SPACE_FREQUENCY 2025
-#define PATH "./siparker.wav"
+#define PATH1 "./message.wav"
+#define PATH2 "./message.txt"
 
 //adds up the elements in an array
 float sum_arr(float *arr, int num){
@@ -60,6 +50,7 @@ void init_cos_arr(float *arr, int num, int freq, int sample_freq){
 }
 
 //returns the tone power of a array of samples against a test frequency
+//note: incoming samples are little endian
 float tone_power(int16_t *samples, float *test_sine, float *test_cos, int num_samples){
   float samples_f[num_samples];
   float I[num_samples];
@@ -96,28 +87,38 @@ int main(){
   fseek(fp, 0L, SEEK_END);
   long f_size = ftell(fp);
   rewind(fp);
-  int num_bytes = fize / (sizeof(int16_t) * SAMPLES_PER_BYTE); //number of bytes of data stored in the file
+  int num_bytes = f_size / (sizeof(int16_t) * SAMPLES_PER_BYTE); //number of bytes of data stored in the file
+  uint8_t least_sig, most_sig, data;
   for (int i = 0; i < num_bytes; i++){
-    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BYTE, fp); //start bit
+    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp); //start bit
+    data = 0;
     for (int j = 0; j < 8; j++){
-      fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BYTE, fp); //start bit
-      if (tone_power(samples_i16, mark_sine, mark_cosine, SAMPLES_PER_BLOCK) > 
-            tone_power(samples_i16, space_sine, space_cosine, SAMPLES_PER_BLOCK)) { //if it's a 1
-              
+      fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp);
+      for (int k = 0; k < SAMPLES_PER_BLOCK; k++){
+        least_sig = samples_i16[k] & 0xff; //flipping samples to big endian so i can cast to float
+        most_sig = ((uint16_t)samples_i16[k] >> 8) & 0xff;
+        samples_i16[k] = ((int16_t) least_sig << 8) | most_sig;
+      }
+      if (tone_power(samples_i16, mark_sine, mark_cos, SAMPLES_PER_BLOCK) > 
+            tone_power(samples_i16, space_sine, space_cos, SAMPLES_PER_BLOCK)) { //if it's a 1
+        data = data | (1 << j);
       }
       else{ //if it's a 0
-        
+        data = data | (0 << j);
       }
     }
-    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BYTE, fp);
-    
+    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp);
+    printf("%c", (char) data);
   }
+  printf("\n");
   /*
   printf("space x mark power test: %lf\n", tone_power(space_sine, mark_sine, mark_cos, SAMPLES_PER_BLOCK));
   printf("mark x mark power test: %lf\n", tone_power(mark_sine, mark_sine, mark_cos, SAMPLES_PER_BLOCK));
   printf("space x space power test: %lf\n", tone_power(space_sine, space_sine, space_cos, SAMPLES_PER_BLOCK));
   printf("mark x space power test: %lf\n", tone_power(mark_sine, space_sine, space_cos, SAMPLES_PER_BLOCK));
   */
+
+  fclose(fp);
 
   free(mark_sine);
   free(mark_cos);
