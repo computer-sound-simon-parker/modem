@@ -68,22 +68,23 @@ int main(){
   init_cos_arr(space_cos, SAMPLES_PER_BLOCK, SPACE_FREQUENCY, SAMPLE_FREQUENCY);
 
 
-  FILE *fp = fopen(PATH1, "rb");
-  if (fp == NULL) {
+  FILE *fp1 = fopen(PATH1, "rb");
+  FILE *fp2 = fopen(PATH2, "wb");
+  if (fp1 == NULL) {
     perror("fopen, no siparker.wav file detected");
     return 1;
   }
 
-  fseek(fp, 0L, SEEK_END);
-  long f_size = ftell(fp);
-  rewind(fp);
+  fseek(fp1, 0L, SEEK_END);
+  long f_size = ftell(fp1);
+  rewind(fp1);
   int num_bytes = f_size / (sizeof(int16_t) * SAMPLES_PER_BYTE); //number of bytes of data stored in the file
   uint8_t least_sig, most_sig, data;
   for (int i = 0; i < num_bytes; i++){
-    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp); //start bit
+    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp1); //start bit
     data = 0;
     for (int j = 0; j < 8; j++){
-      fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp);
+      fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp1);
       for (int k = 0; k < SAMPLES_PER_BLOCK; k++){
         least_sig = samples_i16[k] & 0xff; //flipping samples to big endian so i can cast to float
         most_sig = ((uint16_t)samples_i16[k] >> 8) & 0xff;
@@ -97,8 +98,9 @@ int main(){
         data = data | (0 << j);
       }
     }
-    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp);
+    fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp1);
     printf("%c", (char) data);
+    fwrite(&data, 1, 1, fp2);
   }
   printf("\n");
   /*
@@ -108,7 +110,8 @@ int main(){
   printf("mark x space power test: %lf\n", tone_power(mark_sine, space_sine, space_cos, SAMPLES_PER_BLOCK));
   */
 
-  fclose(fp);
+  fclose(fp1);
+  fclose(fp2);
 
   free(mark_sine);
   free(mark_cos);
