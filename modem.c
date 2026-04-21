@@ -19,20 +19,14 @@
 #define PATH1 "./message.wav"
 #define PATH2 "./message.txt"
 
-//adds up the elements in an array
-float sum_arr(float *arr, int num){
+
+//returns the dot product of 2 arrays as a float
+float dot(float *arr1, float *arr2, int num){
   float sum = 0.;
   for (int i = 0; i < num; i++){
-    sum += arr[i];
-  }
-  return sum;
-}
-
-//multiplies 2 float arrays element wise and puts the results into a third array
-void element_mult_arr(float *arr1, float *arr2, float *result_arr, int num){
-  for (int i = 0; i < num; i++){
-    result_arr[i] = arr1[i] * arr2[i];
+    sum += arr1[i] * arr2[i];
   } 
+  return sum;
 }
 
 //initializes the sine array with values so I don't need to recalculate each time I test for a frequency
@@ -53,14 +47,10 @@ void init_cos_arr(float *arr, int num, int freq, int sample_freq){
 //note: incoming samples are little endian
 float tone_power(int16_t *samples, float *test_sine, float *test_cos, int num_samples){
   float samples_f[num_samples];
-  float I[num_samples];
-  float Q[num_samples];
   for (int i = 0; i < num_samples; i++){
     samples_f[i] = (float) samples[i]; 
   }
-  element_mult_arr(samples_f, test_cos, I, num_samples); 
-  element_mult_arr(samples_f, test_sine, Q, num_samples); 
-  return (float) pow(sum_arr(I, num_samples), 2) + pow(sum_arr(Q, num_samples), 2);
+  return (float) pow(dot(samples_f, test_cos, num_samples), 2) + pow(dot(samples_f, test_sine, num_samples), 2);
 }
 
 int main(){
@@ -78,7 +68,7 @@ int main(){
   init_cos_arr(space_cos, SAMPLES_PER_BLOCK, SPACE_FREQUENCY, SAMPLE_FREQUENCY);
 
 
-  FILE *fp = fopen(PATH, "rb");
+  FILE *fp = fopen(PATH1, "rb");
   if (fp == NULL) {
     perror("fopen, no siparker.wav file detected");
     return 1;
