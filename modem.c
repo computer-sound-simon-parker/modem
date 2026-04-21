@@ -60,7 +60,6 @@ int main(){
   float *space_cos = malloc(sizeof(float) * SAMPLES_PER_BLOCK);
 
   int16_t *samples_i16 = malloc(sizeof(int16_t) * SAMPLES_PER_BLOCK); //for holding the current block of data
-  float *samples_f = malloc(sizeof(float) * SAMPLES_PER_BLOCK);
 
   init_sine_arr(mark_sine, SAMPLES_PER_BLOCK, MARK_FREQUENCY, SAMPLE_FREQUENCY);
   init_cos_arr(mark_cos, SAMPLES_PER_BLOCK, MARK_FREQUENCY, SAMPLE_FREQUENCY);
@@ -103,12 +102,6 @@ int main(){
     fwrite(&data, 1, 1, fp2);
   }
   printf("\n");
-  /*
-  printf("space x mark power test: %lf\n", tone_power(space_sine, mark_sine, mark_cos, SAMPLES_PER_BLOCK));
-  printf("mark x mark power test: %lf\n", tone_power(mark_sine, mark_sine, mark_cos, SAMPLES_PER_BLOCK));
-  printf("space x space power test: %lf\n", tone_power(space_sine, space_sine, space_cos, SAMPLES_PER_BLOCK));
-  printf("mark x space power test: %lf\n", tone_power(mark_sine, space_sine, space_cos, SAMPLES_PER_BLOCK));
-  */
 
   fclose(fp1);
   fclose(fp2);
@@ -118,5 +111,4 @@ int main(){
   free(space_sine);
   free(space_cos);
   free(samples_i16);
-  free(samples_f);
 }
