@@ -1,4 +1,4 @@
-# modem
+# modem, Simon Parker
 
 Build Instructions:\
 'make clean' to clean up .o, .txt, and executable files\
