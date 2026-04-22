@@ -69,10 +69,11 @@ int main(){
   }
 
   fseek(fp1, 0L, SEEK_END);
-  long f_size = ftell(fp1);
+  long f_size = ftell(fp1) - 44; //44 bytes in the header
   rewind(fp1);
   int num_bytes = f_size / (sizeof(int16_t) * SAMPLES_PER_BYTE); //number of bytes of data stored in the file
   uint8_t least_sig, most_sig, data;
+  fseek(fp1, 44, SEEK_SET);  //set file to start of data. How did this work previously w/o this??
   for (int i = 0; i < num_bytes; i++){
     fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp1); //start bit
     data = 0;
