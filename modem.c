@@ -88,9 +88,6 @@ int main(){
             tone_power(samples_i16, space_sine, space_cos, SAMPLES_PER_BLOCK)) { //if it's a 1
         data = data | (1 << j);
       }
-      else{ //if it's a 0
-        data = data | (0 << j);
-      }
     }
     fread(samples_i16, sizeof(int16_t), SAMPLES_PER_BLOCK, fp1);
     printf("%c", (char) data);
