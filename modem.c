@@ -48,18 +48,16 @@ float tone_power(int16_t *samples, float *test_sine, float *test_cos, int num_sa
 }
 
 int main(){
-  float *mark_sine = malloc(sizeof(float) * SAMPLES_PER_BLOCK); //used for precomputing the sine/cosine values needed for
-  float *mark_cos = malloc(sizeof(float) * SAMPLES_PER_BLOCK);  //the tone power calculations
-  float *space_sine = malloc(sizeof(float) * SAMPLES_PER_BLOCK);
-  float *space_cos = malloc(sizeof(float) * SAMPLES_PER_BLOCK);
-
-  int16_t *samples_i16 = malloc(sizeof(int16_t) * SAMPLES_PER_BLOCK); //for holding the current block of data
+  float mark_sine[SAMPLES_PER_BLOCK];
+  float mark_cos[SAMPLES_PER_BLOCK];
+  float space_sine[SAMPLES_PER_BLOCK];
+  float space_cos[SAMPLES_PER_BLOCK];
+  int16_t samples_i16[SAMPLES_PER_BLOCK];
 
   init_sine_arr(mark_sine, SAMPLES_PER_BLOCK, MARK_FREQUENCY, SAMPLE_FREQUENCY);
   init_cos_arr(mark_cos, SAMPLES_PER_BLOCK, MARK_FREQUENCY, SAMPLE_FREQUENCY);
   init_sine_arr(space_sine, SAMPLES_PER_BLOCK, SPACE_FREQUENCY, SAMPLE_FREQUENCY);
   init_cos_arr(space_cos, SAMPLES_PER_BLOCK, SPACE_FREQUENCY, SAMPLE_FREQUENCY);
-
 
   FILE *fp1 = fopen(PATH1, "rb");
   FILE *fp2 = fopen(PATH2, "wb");
@@ -97,10 +95,4 @@ int main(){
 
   fclose(fp1);
   fclose(fp2);
-
-  free(mark_sine);
-  free(mark_cos);
-  free(space_sine);
-  free(space_cos);
-  free(samples_i16);
 }
