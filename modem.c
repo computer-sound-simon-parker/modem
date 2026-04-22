@@ -64,7 +64,7 @@ int main(){
   FILE *fp1 = fopen(PATH1, "rb");
   FILE *fp2 = fopen(PATH2, "wb");
   if (fp1 == NULL) {
-    perror("fopen, no siparker.wav file detected");
+    perror("fopen, no wav file detected");
     return 1;
   }
 
