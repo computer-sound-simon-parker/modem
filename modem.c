@@ -39,7 +39,6 @@ void init_cos_arr(float *arr, int num, int freq, int sample_freq){
 }
 
 //returns the tone power of a array of samples against a test frequency
-//note: incoming samples are little endian
 float tone_power(int16_t *samples, float *test_sine, float *test_cos, int num_samples){
   float samples_f[num_samples];
   for (int i = 0; i < num_samples; i++){
